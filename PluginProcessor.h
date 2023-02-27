@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <juce_dsp/juce_dsp.h>
 
 //==============================================================================
 class AudioPluginAudioProcessor  : public juce::AudioProcessor
@@ -42,50 +43,15 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout() {
-        juce::AudioProcessorValueTreeState::ParameterLayout layout;
-
-        layout.add(std::make_unique<juce::AudioParameterFloat>(
-                "LowCut Freq",
-                "LowCut Freq",
-                juce::NormalisableRange<float>(20.0f, 20000.f, 1.f, 1.f),
-                        20.f));
-        layout.add(std::make_unique<juce::AudioParameterFloat>(
-                "HighCut Freq",
-                "HighCut Freq",
-                juce::NormalisableRange<float>(20.0f, 20000.f, 1.f, 1.f),
-                20000.f));
-        layout.add(std::make_unique<juce::AudioParameterFloat>(
-                "Peak Freq",
-                "Peak Freq",
-                juce::NormalisableRange<float>(20.0f, 20000.f, 1.f, 1.f),
-                750.f));
-        layout.add(std::make_unique<juce::AudioParameterFloat>(
-                "Peak Gain",
-                "Peak Gain",
-                juce::NormalisableRange<float>(-24.0f, 24.f, 0.5f, 1.f),
-                0.f));
-        layout.add(std::make_unique<juce::AudioParameterFloat>(
-                "Peak Q",
-                "Peak Q",
-                juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.f),
-                1.f));
-
-        juce::StringArray stringArray;
-        for(int i = 0; i < 4; ++i)
-        {
-            juce::String str;
-            str << (12 + i*12) << " db/Oct";
-            stringArray.add(str);
-        }
-        layout.add(std::make_unique<juce::AudioParameterChoice>("LowCut Slope", "LowCut Slope", stringArray, 0));
-        layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", stringArray, 0));
-
-        return layout;
-    }
+    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     juce::AudioProcessorValueTreeState apvts {*this, nullptr, "Parameters", createParameterLayout()};
 
 private:
+    using Filter = juce::dsp::IIR::Filter<float>;
+    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
+    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
+    MonoChain leftChain, rightChain;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };
