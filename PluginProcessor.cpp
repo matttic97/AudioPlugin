@@ -268,7 +268,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     *rightChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
 
     auto cutCoefficient = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(
-            chainSettings.peakFreq,
+            chainSettings.lowCutFreq,
             getSampleRate(),
             2 * (chainSettings.lowCutSlope + 1));
 
