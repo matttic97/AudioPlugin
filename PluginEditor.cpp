@@ -39,7 +39,7 @@ void ResponseCurveComponent::timerCallback()
         auto lowCutCoefficients = makeLowCutFilter(chainSettings, processorRef.getSampleRate());
         updateCutFilter(monoChain.get<ChainPositions::LowCut>(), lowCutCoefficients, chainSettings.lowCutSlope);
 
-        auto highCutCoefficients = makeLowCutFilter(chainSettings, processorRef.getSampleRate());
+        auto highCutCoefficients = makeHighCutFilter(chainSettings, processorRef.getSampleRate());
         updateCutFilter(monoChain.get<ChainPositions::HighCut>(), highCutCoefficients, chainSettings.highCutSlope);
 
         // signal a reapaint
