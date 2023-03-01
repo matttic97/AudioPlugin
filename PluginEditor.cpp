@@ -122,6 +122,20 @@ void AudioPluginAudioProcessorEditor::resized()
 }
 
 //==============================================================================
+void AudioPluginAudioProcessorEditor::parameterValueChanged(int parameterIndex, float newValue)
+{
+    parametersChanged.set(true);
+}
+
+void AudioPluginAudioProcessorEditor::timerCallback()
+{
+    if (parametersChanged.compareAndSetBool(false, true))
+    {
+        // update the monochain
+        // signal a reapaint
+    }
+}
+
 std::vector<juce::Component*> AudioPluginAudioProcessorEditor::getComponents()
 {
     return {

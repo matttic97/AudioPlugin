@@ -198,6 +198,7 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
     }
 }
 
+//==============================================================================
 ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
 {
     ChainSettings settings;
@@ -213,22 +214,27 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     return settings;
 }
 
-void AudioPluginAudioProcessor::updatePeakFilter(const ChainSettings& chainSettings)
+void updateCoefficients(Coefficients &old, const Coefficients &replacements)
 {
-    auto peakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-            getSampleRate(),
+    *old = *replacements;
+}
+
+Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRate)
+{
+    return juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+            sampleRate,
             chainSettings.peakFreq,
             chainSettings.peakQ,
             juce::Decibels::decibelsToGain(chainSettings.peakGain)
     );
+}
+
+void AudioPluginAudioProcessor::updatePeakFilter(const ChainSettings& chainSettings)
+{
+    auto peakCoefficients = makePeakFilter(chainSettings, getSampleRate());
 
     updateCoefficients(leftChain.get<ChainPositions::Peak>().coefficients, peakCoefficients);
     updateCoefficients(rightChain.get<ChainPositions::Peak>().coefficients, peakCoefficients);
-}
-
-void AudioPluginAudioProcessor::updateCoefficients(Coefficients &old, const Coefficients &replacements)
-{
-    *old = *replacements;
 }
 
 void AudioPluginAudioProcessor::updateLowCutFilters(const ChainSettings &chainSettings)
