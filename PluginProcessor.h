@@ -106,11 +106,11 @@ private:
             }
             case Slope_36:
             {
-                update<1>(chain, coefficients);
+                update<2>(chain, coefficients);
             }
             case Slope_24:
             {
-                update<2>(chain, coefficients);
+                update<1>(chain, coefficients);
             }
             case Slope_12:
             {
