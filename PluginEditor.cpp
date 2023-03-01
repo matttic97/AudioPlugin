@@ -21,11 +21,24 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
         addAndMakeVisible(comp);
     }
 
+    const auto& params = processorRef.getParameters();
+    for (int i = 0; i < params.size(); ++i)
+    {
+        params[i]->addListener(this);
+    }
+
+    startTimerHz(60);
+
     setSize (650, 400);
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
 {
+    const auto& params = processorRef.getParameters();
+    for (int i = 0; i < params.size(); ++i)
+    {
+        params[i]->removeListener(this);
+    }
 }
 
 //==============================================================================
@@ -132,7 +145,12 @@ void AudioPluginAudioProcessorEditor::timerCallback()
     if (parametersChanged.compareAndSetBool(false, true))
     {
         // update the monochain
+        auto chainSettings = getChainSettings(processorRef.apvts);
+        auto peakCoefficients = makePeakFilter(chainSettings, processorRef.getSampleRate());
+        updateCoefficients(monoChain.get<ChainPositions::Peak>().coefficients, peakCoefficients);
+
         // signal a reapaint
+        repaint();
     }
 }
 

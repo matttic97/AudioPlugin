@@ -49,7 +49,7 @@ public:
         to trigger an AsyncUpdater or ChangeBroadcaster which you can respond to later on the
         message thread.
     */
-    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override;
+    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override { };
 
     void timerCallback() override;
 
