@@ -62,10 +62,7 @@ void updateCutFilter(ChainType& chain, const CoefficientType& coefficients, cons
         case Slope_24:
             update<1>(chain, coefficients);
         case Slope_12:
-        {
             update<0>(chain, coefficients);
-            break;
-        }
     }
 }
 
@@ -138,6 +135,7 @@ private:
     void updateHighCutFilters(const ChainSettings& chainSettings);
 
     void updateFilters();
+
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
