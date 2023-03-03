@@ -324,6 +324,7 @@ void ResponseCurveComponent::resized()
         g.drawFittedText(str, r, Justification::centred, 1);
     }
 
+    const int paddingX = 4;
     Array<float> gains
     {
         -24, -12, 0, 12, 24
@@ -343,10 +344,14 @@ void ResponseCurveComponent::resized()
 
         Rectangle<int> r;
         r.setSize(textWidth, fontHeight);
-        r.setX(getWidth() - textWidth - 4);
+        r.setX(paddingX);
         r.setCentre(r.getCentreX(), y);
 
         g.setColour(Colours::white);
+        g.drawFittedText(str, r, Justification::centred, 1);
+
+        r.setX(getWidth() - textWidth - paddingX);
+        r.setCentre(r.getCentreX(), y);
         g.drawFittedText(str, r, Justification::centred, 1);
     }
 }
@@ -357,8 +362,8 @@ juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
 
     bounds.removeFromTop(15);
     bounds.removeFromBottom(2);
-    bounds.removeFromLeft(24);
-    bounds.removeFromRight(24);
+    bounds.removeFromLeft(25);
+    bounds.removeFromRight(25);
 
     return bounds;
 }
