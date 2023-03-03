@@ -336,9 +336,7 @@ void ResponseCurveComponent::resized()
         g.drawHorizontalLine(y, left, right);
 
         String str;
-        if (gain > 0)
-            str << "+";
-        str << gain;
+        str << (gain - 24.f);
 
         auto textWidth = g.getCurrentFont().getStringWidth(str);
 
@@ -350,6 +348,13 @@ void ResponseCurveComponent::resized()
         g.setColour(Colours::white);
         g.drawFittedText(str, r, Justification::centred, 1);
 
+        str.clear();
+        if (gain > 0)
+            str << "+";
+        str << gain;
+
+        textWidth = g.getCurrentFont().getStringWidth(str);
+        r.setSize(textWidth, fontHeight);
         r.setX(getWidth() - textWidth - paddingX);
         r.setCentre(r.getCentreX(), y);
         g.drawFittedText(str, r, Justification::centred, 1);
