@@ -284,7 +284,8 @@ void ResponseCurveComponent::resized()
     background = Image(Image::PixelFormat::RGB, getWidth(), getHeight(), true);
 
     Graphics g(background);
-    g.setColour(Colours::dimgrey);
+    auto fontHeight = 10;
+    g.setFont(fontHeight);
 
     auto renderArea = getAnalysisArea();
     auto left = renderArea.getX();
@@ -295,31 +296,58 @@ void ResponseCurveComponent::resized()
 
     Array<float> freqs
     {
-        20, 30, 40, 50, 100,
-        200, 300, 400, 500, 1000,
-        2000, 3000, 4000, 5000, 10000,
-        20000
+        30, 50, 100,
+        200, 300, 500, 1000,
+        2000, 3000, 5000, 10000
     };
-
-    Array<float> xs;
     for (auto f : freqs)
     {
         auto normX = mapFromLog10(f, 20.f, 20000.f);
         auto x = left + width * normX;
+        g.setColour(Colours::dimgrey);
         g.drawVerticalLine(x, top, bottom);
-        xs.add(x);
+
+        String str;
+        if (f >= 1000)
+            str << f/1000 << "kHz";
+        else
+            str << f << "Hz";
+
+        auto textWidth = g.getCurrentFont().getStringWidth(str);
+
+        Rectangle<int> r;
+        r.setSize(textWidth, fontHeight);
+        r.setCentre(x, 0);
+        r.setY(2);
+
+        g.setColour(Colours::white);
+        g.drawFittedText(str, r, Justification::centred, 1);
     }
 
     Array<float> gains
     {
         -24, -12, 0, 12, 24
     };
-
     for (auto gain : gains)
     {
         auto y = jmap(gain, -24.f, 24.f, float(bottom), float(top));
         g.setColour(gain == 0.f ? Colours::darkgrey : Colours::dimgrey);
         g.drawHorizontalLine(y, left, right);
+
+        String str;
+        if (gain > 0)
+            str << "+";
+        str << gain;
+
+        auto textWidth = g.getCurrentFont().getStringWidth(str);
+
+        Rectangle<int> r;
+        r.setSize(textWidth, fontHeight);
+        r.setX(getWidth() - textWidth - 4);
+        r.setCentre(r.getCentreX(), y);
+
+        g.setColour(Colours::white);
+        g.drawFittedText(str, r, Justification::centred, 1);
     }
 }
 
@@ -327,10 +355,10 @@ juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
 {
     auto bounds = getLocalBounds();
 
-    bounds.removeFromTop(12);
+    bounds.removeFromTop(15);
     bounds.removeFromBottom(2);
-    bounds.removeFromLeft(20);
-    bounds.removeFromRight(20);
+    bounds.removeFromLeft(24);
+    bounds.removeFromRight(24);
 
     return bounds;
 }
@@ -339,8 +367,8 @@ juce::Rectangle<int> ResponseCurveComponent::getAnalysisArea()
 {
     auto bounds = getRenderArea();
 
-    bounds.removeFromTop(4);
-    bounds.removeFromBottom(4);
+    bounds.removeFromTop(5);
+    bounds.removeFromBottom(5);
 
     return bounds;
 }
@@ -390,7 +418,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
         addAndMakeVisible(comp);
     }
 
-    setSize (600, 500);
+    setSize (700, 600);
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
@@ -412,7 +440,7 @@ void AudioPluginAudioProcessorEditor::resized()
     // subcomponents in your editor..
 
     auto bounds = getLocalBounds();
-    float hRatio = 26.f / 100.f;
+    float hRatio = 30.f / 100.f;
     auto responseArea = bounds.removeFromTop(bounds.getHeight() * hRatio);
 
     responseCurveComponent.setBounds(responseArea);
