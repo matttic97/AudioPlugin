@@ -313,8 +313,10 @@ void ResponseCurveComponent::paint (juce::Graphics& g)
         responseCurve.lineTo(responseArea.getX() + i, map(mags[i]));
     }
 
-    g.setColour(Colours::blue);
-    g.strokePath(leftChannelFFTPath, PathStrokeType(1));
+    leftChannelFFTPath.applyTransform(AffineTransform().translated(responseArea.getX(), responseArea.getY()));
+
+    g.setColour(Colours::yellow);
+    g.strokePath(leftChannelFFTPath, PathStrokeType(2));
 
     g.setColour(Colours::orange);
     g.drawRoundedRectangle(getRenderArea().toFloat(), 4.f, 1.f);
