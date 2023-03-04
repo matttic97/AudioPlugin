@@ -274,7 +274,8 @@ private:
 
     void updateFilters();
 
-
+    /* for calibrating fft path */
+    //juce::dsp::Oscillator<float> osc;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };

@@ -156,6 +156,30 @@ private:
     Fifo<PathType> pathFifo;
 };
 
+struct PathProducer
+{
+    PathProducer(SingleChannelSampleFifo<AudioPluginAudioProcessor::BlockType>& scsf) :
+            channelFifo(&scsf)
+    {
+        channelFFTDataGenerator.changeOrder(FFTOrder::order4096);
+        monoBuffer.setSize(1, channelFFTDataGenerator.getFFTSize());
+    }
+
+    void process(juce::Rectangle<float> fftBounds, double sampleRate);
+    juce::Path getPath() { return channelFFTPath; }
+
+private:
+    SingleChannelSampleFifo<AudioPluginAudioProcessor::BlockType>* channelFifo;
+
+    juce::AudioBuffer<float> monoBuffer;
+
+    FFTDataGenerator<std::vector<float>> channelFFTDataGenerator;
+
+    AnalyzerPathGenerator<juce::Path> pathProducer;
+
+    juce::Path channelFFTPath;
+};
+
 struct LookAndFeel : juce::LookAndFeel_V4
 {
     void drawRotarySlider (juce::Graphics&, int x, int y, int width, int height,
@@ -250,15 +274,7 @@ private:
 
     juce::Rectangle<int> getAnalysisArea();
 
-    SingleChannelSampleFifo<AudioPluginAudioProcessor::BlockType>* leftChannelFifo;
-
-    juce::AudioBuffer<float> monoBuffer;
-
-    FFTDataGenerator<std::vector<float>> leftChannelFFTDataGenerator;
-
-    AnalyzerPathGenerator<juce::Path> pathProducer;
-
-    juce::Path leftChannelFFTPath;
+    PathProducer leftPathProducer, rightPathProducer;
 };
 
 //==============================================================================
