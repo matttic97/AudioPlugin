@@ -9,10 +9,10 @@ void LookAndFeel::drawRotarySlider(juce::Graphics &g, int x, int y, int width, i
 
     auto bounds = Rectangle<float>(x, y, width, height);
 
-    g.setColour(Colour(0, 102, 204));
+    g.setColour(slider.isEnabled() ? Colour(0, 102, 204) : Colours::darkgrey);
     g.fillEllipse(bounds);
 
-    g.setColour(Colour(0, 76, 153));
+    g.setColour(slider.isEnabled() ? Colour(0, 76, 153) : Colours::dimgrey);
     g.drawEllipse(bounds, 2.f);
 
     if (auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider))
@@ -44,10 +44,10 @@ void LookAndFeel::drawRotarySlider(juce::Graphics &g, int x, int y, int width, i
         r.setSize(strWidth + 4, rswl->getTextHeight() + 2);
         r.setCentre(bounds.getCentre());
 
-        g.setColour(Colours::black);
+        g.setColour(slider.isEnabled() ? Colours::black : Colours::darkgrey);
         g.fillRect(r);
 
-        g.setColour(Colours::white);
+        g.setColour(slider.isEnabled() ? Colours::white : Colours::lightgrey);
         g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
     }
 }
@@ -118,7 +118,7 @@ void RotarySliderWithLabels::paint(juce::Graphics &g)
     auto center = sliderBounds.toFloat().getCentre();
     auto radius = sliderBounds.getWidth() * 0.5f;
 
-    g.setColour(Colour(76, 153, 0));
+    g.setColour(isEnabled() ? Colour(76, 153, 0) : Colours::darkgrey);
     g.setFont(getTextHeight());
 
     auto numChoices = labels.size();
@@ -546,6 +546,16 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     peakBypassButton.setLookAndFeel(&lnf);
     highCutBypassButton.setLookAndFeel(&lnf);
 
+    auto safePtr = juce::Component::SafePointer<AudioPluginAudioProcessorEditor>(this);
+
+    this->updateLowCutSliders(safePtr);
+    this->updatePeakSliders(safePtr);
+    this->updateHighCutSliders(safePtr);
+
+    lowCutBypassButton.onClick = [this, safePtr] (){ this->updateLowCutSliders(safePtr); };
+    peakBypassButton.onClick = [this, safePtr] () { this->updatePeakSliders(safePtr); };
+    highCutBypassButton.onClick = [this, safePtr] () { this->updateHighCutSliders(safePtr); };
+
     setSize (700, 600);
 }
 
@@ -554,6 +564,40 @@ AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
     lowCutBypassButton.setLookAndFeel(nullptr);
     peakBypassButton.setLookAndFeel(nullptr);
     highCutBypassButton.setLookAndFeel(nullptr);
+}
+
+void AudioPluginAudioProcessorEditor::updateLowCutSliders(juce::Component::SafePointer<AudioPluginAudioProcessorEditor> safePtr)
+{
+    if (auto* comp = safePtr.getComponent())
+    {
+        auto bypassed = comp->lowCutBypassButton.getToggleState();
+
+        comp->lowCutFreqSlider.setEnabled(!bypassed);
+        comp->lowCutSlopeSlider.setEnabled(!bypassed);
+    }
+}
+
+void AudioPluginAudioProcessorEditor::updatePeakSliders(juce::Component::SafePointer<AudioPluginAudioProcessorEditor> safePtr)
+{
+    if (auto* comp = safePtr.getComponent())
+    {
+        auto bypassed = comp->peakBypassButton.getToggleState();
+
+        comp->peakFreqSlider.setEnabled(!bypassed);
+        comp->peakGainSlider.setEnabled(!bypassed);
+        comp->peakQSlider.setEnabled(!bypassed);
+    }
+}
+
+void AudioPluginAudioProcessorEditor::updateHighCutSliders(juce::Component::SafePointer<AudioPluginAudioProcessorEditor> safePtr)
+{
+    if (auto* comp = safePtr.getComponent())
+    {
+        auto bypassed = comp->highCutBypassButton.getToggleState();
+
+        comp->highCutFreqSlider.setEnabled(!bypassed);
+        comp->highCutSlopeSlider.setEnabled(!bypassed);
+    }
 }
 
 //==============================================================================

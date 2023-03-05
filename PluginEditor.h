@@ -328,5 +328,9 @@ private:
 
     LookAndFeel lnf;
 
+    void updateLowCutSliders(juce::Component::SafePointer<AudioPluginAudioProcessorEditor> safePtr);
+    void updatePeakSliders(juce::Component::SafePointer<AudioPluginAudioProcessorEditor> safePtr);
+    void updateHighCutSliders(juce::Component::SafePointer<AudioPluginAudioProcessorEditor> safePtr);
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessorEditor)
 };
