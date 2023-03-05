@@ -159,6 +159,8 @@ struct ChainSettings
     float lowCutFreq { 0 }, highCutFreq { 0 };
 
     Slope lowCutSlope { Slope::Slope_12 }, highCutSlope { Slope::Slope_12 };
+
+    bool lowCutBypassed { false }, highCutBypassed { false }, peakBypassed { false }, analyzerEnabled { true };
 };
 
 using Filter = juce::dsp::IIR::Filter<float>;
